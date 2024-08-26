@@ -1,0 +1,44 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+h1 {
+    font-size: 50px;
+}
+
+input {
+    width: 90%;
+    margin: 50px 0; 
+    font-size: 50px;
+    color: white;
+    padding: 15px 25px;
+    border: 5px solid white;
+    border-radius: 25px;
+    background-color: #1e1f22;
+    cursor: thick solid #fff;
+}
+
+.container {
+    background-color: #1e1f22;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.game {
+    display: flex;
+    flex-direction: column;     
+    justify-content: center;
+    align-items: center;
+}
+
+#banner {
+    color: green;
+}

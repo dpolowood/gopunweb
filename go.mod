@@ -1,3 +1,3 @@
-module gitlab.migrandama.com/dpolowood/gopunweb
+module github.com/dpolowood/gopunweb
 
 go 1.22.3

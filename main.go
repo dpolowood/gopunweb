@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"html/template"
 	"log"
-	"math/rand/v2"
 	"net/http"
 	"os"
 	"strings"
@@ -65,14 +64,151 @@ var puns = []Pun{
         "guts",
         "Why don't skeletons fight each other? They don't have the guts",
     },
-}
-
-type Cookie struct {
-    Name    string
-    Value   string
-
-    Path    string
-    Expires time.Time
+    {
+        "Why did the golfer bring two pairs of pants? In case he got a ____ in one",
+        "hole",
+        "Why did the golfer bring two pairs of pants? In case he got a hole in one",
+    },
+    {
+        "What do you call cheese that isn't yours? _____ cheese",
+        "Nacho",
+        "What do you call cheese that isn't yours? Nacho cheese",
+    },
+    {
+        "Why did the math book look sad? It had too many ________",
+        "problems",
+        "Why did the math book look sad? It had too many problems",
+    },
+    {
+        "Why don't scientists trust _____? Because they make up everything",
+        "atoms",
+        "Why don't scientists trust atoms? Because they make up everything",
+    },
+    {
+        "Why don't scientists trust _____? Because they make up everything",
+        "atoms",
+        "Why don't scientists trust atoms? Because they make up everything",
+    },
+    {
+        "Why did the tomato turn red? Because it saw the _____ dressing.",
+        "salad",
+        "Why did the tomato turn red? Because it saw the salad dressing.",
+    },
+    {
+        "What do you call a bear with no teeth? A _____ bear.",
+        "gummy",
+        "What do you call a bear with no teeth? A gummy bear.",
+    },
+    {
+        "What do you call an alligator in a vest? An ____________.",
+        "investigator",
+        "What do you call an alligator in a vest? An investigator.",
+    },
+    {
+        "What do you call a sleeping bull? A _________.",
+        "bulldozer",
+        "What do you call a sleeping bull? A bulldozer.",
+    },
+    {
+        "What did one ocean say to the other ocean? Nothing, they just _____.",
+        "waved",
+        "What did one ocean say to the other ocean? Nothing, they just waved.",
+    },
+    {
+        "What do you get when you cross a snowman and a vampire? _________.",
+        "Frostbite",
+        "What do you get when you cross a snowman and a vampire? Frostbite.",
+    },
+    {
+        "Why don’t some couples go to the gym? Because some relationships don’t ____ out.",
+        "work",
+        "Why don’t some couples go to the gym? Because some relationships don’t work out.",
+    },
+    {
+        "What kind of music do mummies listen to? ___ music.",
+        "Rap",
+        "What kind of music do mummies listen to? Rap music.",
+    },
+    {
+        "What’s a bee’s favorite type of haircut? A ____ cut.",
+        "buzz",
+        "What’s a bee’s favorite type of haircut? A buzz cut.",
+    },
+    {
+        "How do you organize a space party? You _____.",
+        "planet",
+        "How do you organize a space party? You planet.",
+    },
+    {
+        "What did the grape do when it got stepped on? Nothing but let out a little ____.",
+        "wine",
+        "What did the grape do when it got stepped on? Nothing but let out a little wine.",
+    },
+    {
+        "What do you call a dinosaur with an extensive vocabulary? A _________.",
+        "thesaurus",
+        "What do you call a dinosaur with an extensive vocabulary? A thesaurus.",
+    },
+    {
+        "What did one hat say to the other hat? Stay here, I'm going on _____.",
+        "ahead",
+        "What did one hat say to the other hat? Stay here, I'm going on ahead.",
+    },
+    {
+        "How do you make holy water? You boil the ____ out of it.",
+        "hell",
+        "How do you make holy water? You boil the hell out of it.",
+    },
+    {
+        "What do you call a bear with no ears? _.",
+        "B",
+        "What do you call a bear with no ears? B.",
+    },
+    {
+        "How do you make a tissue dance? Put a little ______ in it.",
+        "boogie",
+        "How do you make a tissue dance? Put a little boogie in it.",
+    },
+    {
+        "Why did the math teacher go to the beach? To work on his ___-gent.",
+        "tan",
+        "Why did the math teacher go to the beach? To work on his tan-gent.",
+    },
+    {
+        "What’s a skeleton’s least favorite room in the house? The ______ room.",
+        "living",
+        "What’s a skeleton’s least favorite room in the house? The living room.",
+    },
+    {
+        "Why do cows wear bells? Because their _____ don’t work.",
+        "horns",
+        "Why do cows wear bells? Because their horns don’t work.",
+    },
+    {
+        "What kind of tree fits in your hand? A ____ tree.",
+        "palm",
+        "What kind of tree fits in your hand? A palm tree.",
+    },
+    {
+        "Why did the chicken join a band? Because it had the _________.",
+        "drumsticks",
+        "Why did the chicken join a band? Because it had the drumsticks.",
+    },
+    {
+        "What do you call a cow with no legs? _____ beef.",
+        "Ground",
+        "What do you call a cow with no legs? Ground beef.",
+    },
+    {
+        "What’s brown and sticky? A _____.",
+        "stick",
+        "What’s brown and sticky? A stick.",
+    },
+    {
+        "Why did the computer go to the doctor? It had a _____.",
+        "virus",
+        "Why did the computer go to the doctor? It had a virus.",
+    },
 }
 
 const tpl = `
@@ -124,7 +260,7 @@ const tpl3 = `
 </div>
 `
 
-func GetRecords() []Record {
+func GetRecords() *[]Record {
     var records []Record
     iter := client.Collection("wins").Documents(ctx)
     for {
@@ -138,12 +274,9 @@ func GetRecords() []Record {
         var record Record
         doc.DataTo(&record)
         records = append(records, record)
-        log.Println(records)
-        
-        //log.Println(doc.Data())
     }
 
-    return records
+    return &records
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -154,31 +287,33 @@ func handler2(w http.ResponseWriter, r *http.Request) {
     prevCookie, _ := r.Cookie("startTime")
     if prevCookie == nil {
         now := time.Now().UTC()
-        midnight := time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 0, now.UTC().Location())
-        seconds := midnight.Sub(now).Seconds()
+        midnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.UTC().Location())
+        secondsTilMidnight := midnight.Sub(now).Seconds()
         cookie := http.Cookie{
             Name:    "startTime",
             Value:   time.Now().UTC().String(),
             Path:    "/",
-            Expires: time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.UTC().Location()),
+            Expires: midnight,
             SameSite: http.SameSiteLaxMode,
-            MaxAge: int(seconds),
+            MaxAge: int(secondsTilMidnight),
         }
 
         http.SetCookie(w, &cookie)
     }
 
     w.Header().Set("Content-Type", "text/html")
-    random := rand.IntN(5)
+    firstDay, _ := time.Parse("2006-01-02", "2024-09-06")
+    now := time.Now().UTC()
+    timeBetween := now.Sub(firstDay.UTC())
+    daysSince := int(timeBetween.Hours() / 24)
+    
     t, _ :=  template.New("webpage").Parse(tpl2)
     data := struct {
-        Title     string
         Prompt    string
         Punchline string
     }{
-        Title: "what's so punny",
-        Prompt: puns[random].Prompt,
-        Punchline: puns[random].Punchline,
+        Prompt: puns[daysSince].Prompt,
+        Punchline: puns[daysSince].Punchline,
     }
 
     _ = t.Execute(w, data)
@@ -247,17 +382,11 @@ func handler3(w http.ResponseWriter, r *http.Request) {
         win = "id=\"popup\""
         now := time.Now().UTC()
         startOfDay := time.Date(now.Year(),now.Month(), now.Day(), 0, 0, 0 ,0, now.UTC().Location())
-        midnight := time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 0, now.UTC().Location())
+        midnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.UTC().Location())
         recordCount := 0
         records := GetRecords()
         better := 0
-        for _, record := range records {
-            log.Println(record.Duration)
-            log.Println(startOfDay)
-            log.Println(midnight)
-            log.Println(record.Timestamp)
-            log.Println(startOfDay.After(record.Timestamp))
-            log.Println(midnight.Before(record.Timestamp))
+        for _, record := range *records {
             if startOfDay.Before(record.Timestamp) && midnight.After(record.Timestamp) {
                 recordCount++
                 if int(diff) > record.Duration {
